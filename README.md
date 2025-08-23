@@ -1,7 +1,10 @@
-# Bash Loading Spinners
+# bash-cli-spinners
+> +90 spinners for use in the terminal
 
-A clean, JSON-based bash loading spinner library using the official
-[cli-spinners](https://github.com/sindresorhus/cli-spinners) database.
+![demo](demo.svg)
+
+A bash/zsh cli spinner library heavily inspired by
+[cli-spinners](https://github.com/sindresorhus/cli-spinners).
 
 ## Features
 

@@ -14,6 +14,7 @@ A bash/zsh cli spinner library **heavily inspired** by
 - **Color support** - 14 different colors available
 - **Two modes** - Show for duration or run with command
 - **Clean output** - Proper cursor management and cleanup
+- **Web gallery** - Interactive browser interface to preview all spinners
 
 ## Requirements
 
@@ -44,6 +45,9 @@ sudo apt install jq bc
 
 # Run the demo
 ./demo.sh
+
+# Browse all spinners in a web gallery
+make serve
 ```
 
 ## Usage
@@ -89,6 +93,21 @@ Some of the most popular spinners include:
 - `shark` - Swimming shark
 - `material` - Material design progress bar
 
+## Web Gallery
+
+Browse all +80 spinners in an interactive web interface:
+
+```bash
+make serve
+```
+
+This starts a local web server at `http://localhost:8080` with features:
+- Live preview of all spinners at authentic speeds
+- Search and filter functionality
+- Click-to-copy spinner names
+- Light/dark theme toggle
+- Responsive design for all devices
+
 ## Architecture
 
 The library is built with a clean architecture:
@@ -96,6 +115,8 @@ The library is built with a clean architecture:
 - `spinners.json` - Official cli-spinners database (+80 spinners)
 - `spinner.sh` - Core engine with JSON parsing and animation logic
 - `demo.sh` - Interactive demonstration script
+- `website/` - Web gallery for browsing spinners
+- `Makefile` - Build targets for serving and demos
 
 ### JSON Structure
 

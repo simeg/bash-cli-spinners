@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash CLI Spinners Gallery</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0bec5;
+            --text-accent: #4fc3f7;
+            --text-success: #81c784;
+            --border-color: #444;
+            --border-hover: #4fc3f7;
+            --shadow-color: rgba(79, 195, 247, 0.15);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-accent: #1976d2;
+            --text-success: #388e3c;
+            --border-color: #ddd;
+            --border-hover: #1976d2;
+            --shadow-color: rgba(25, 118, 210, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .header h1 {
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-hover);
+        }
+
+        .spinner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .spinner-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spinner-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .spinner-display {
+            font-size: 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+
+        .spinner-name {
+            color: var(--text-accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .spinner-interval {
+            color: var(--text-success);
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .copy-notification.show {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-results {
+            text-align: center;
+            color: #ff7043;
+            font-size: 1.2rem;
+            margin-top: 40px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .spinner-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .spinner-display {
+                font-size: 1.5rem;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+
+    <div class="header">
+        <h1>🌀 Bash CLI Spinners Gallery</h1>
+        <p>Click any spinner to copy its name to clipboard</p>
+        <p style="color: var(--text-success); font-size: 0.9rem; margin-bottom: 15px;">
+            <em>Note: Some spinners may appear different than in terminal due to font rendering</em>
+        </p>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search spinners..." id="searchInput">
+        </div>
+
+        <div class="stats" id="stats">
+            Loading spinners...
+        </div>
+    </div>
+
+    <div class="spinner-grid" id="spinnerGrid">
+    </div>
+
+    <div class="no-results" id="noResults">
+        No spinners found matching your search.
+    </div>
+
+    <div class="copy-notification" id="copyNotification">
+        Copied to clipboard!
+    </div>
+
+    <script>
+        let spinnersData = {};
+        let spinnerElements = [];
+
+        async function loadSpinners() {
+            try {
+                const response = await fetch('spinners.json');
+                spinnersData = await response.json();
+
+                const spinnerGrid = document.getElementById('spinnerGrid');
+                const stats = document.getElementById('stats');
+
+                const spinnerNames = Object.keys(spinnersData);
+                stats.textContent = `${spinnerNames.length} spinners available`;
+
+                spinnerNames.forEach(name => {
+                    const spinner = spinnersData[name];
+                    const card = createSpinnerCard(name, spinner);
+                    spinnerGrid.appendChild(card);
+                    spinnerElements.push(card);
+                });
+
+                startAllAnimations();
+                setupSearch();
+
+            } catch (error) {
+                console.error('Error loading spinners:', error);
+                document.getElementById('stats').textContent = 'Error loading spinners';
+            }
+        }
+
+        function createSpinnerCard(name, spinner) {
+            const card = document.createElement('div');
+            card.className = 'spinner-card';
+            card.dataset.name = name.toLowerCase();
+
+            card.innerHTML = `
+                <div class="spinner-display" id="spinner-${name}"></div>
+                <div class="spinner-name">${name}</div>
+                <div class="spinner-interval">${spinner.interval}ms</div>
+            `;
+
+            card.addEventListener('click', () => copyToClipboard(name));
+
+            return card;
+        }
+
+        function startAllAnimations() {
+            Object.keys(spinnersData).forEach(name => {
+                const spinner = spinnersData[name];
+                const element = document.getElementById(`spinner-${name}`);
+                if (element) {
+                    animateSpinner(element, spinner.frames, spinner.interval);
+                }
+            });
+        }
+
+        function animateSpinner(element, frames, interval) {
+            let frameIndex = 0;
+
+            function updateFrame() {
+                if (element.offsetParent !== null) { // Only animate if visible
+                    element.textContent = frames[frameIndex];
+                    frameIndex = (frameIndex + 1) % frames.length;
+                }
+            }
+
+            updateFrame(); // Initial frame
+            setInterval(updateFrame, interval);
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const noResults = document.getElementById('noResults');
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                let visibleCount = 0;
+
+                spinnerElements.forEach(card => {
+                    const name = card.dataset.name;
+                    const isVisible = name.includes(searchTerm);
+                    card.style.display = isVisible ? 'block' : 'none';
+                    if (isVisible) visibleCount++;
+                });
+
+                const stats = document.getElementById('stats');
+                if (searchTerm) {
+                    stats.textContent = `${visibleCount} of ${spinnerElements.length} spinners shown`;
+                } else {
+                    stats.textContent = `${spinnerElements.length} spinners available`;
+                }
+
+                noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+            });
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showCopyNotification();
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyNotification();
+            }
+        }
+
+        function showCopyNotification() {
+            const notification = document.getElementById('copyNotification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        function initializeTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+
+            // Set initial theme
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+            }
+
+            // Theme toggle handler
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+
+                if (currentTheme === 'light') {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.textContent = '🌙';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    themeToggle.textContent = '☀️';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Load spinners and initialize theme when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSpinners();
+            initializeTheme();
+        });
+    </script>
+</body>
+</html>

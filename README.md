@@ -139,34 +139,6 @@ Each spinner in `spinners.json` follows this format:
 - `interval`: Time between frames in milliseconds
 - `frames`: Array of strings/characters to display
 
-## Advanced Usage
-
-### Sourcing Functions
-
-You can source the spinner script to use functions directly:
-
-```bash
-source spinner.sh
-
-# Use functions directly
-show_spinner "dots" 5 "Custom loading" "blue"
-run_with_spinner "pong" "Background task" "green" sleep 10
-```
-
-### Adding Custom Spinners
-
-Edit `spinners.json` to add your own spinners:
-
-```json
-{
-  "custom": {
-    "interval": 100,
-    "frames": ["(o)", "(O)", "(0)", "(O)"]
-  }
-}
-```
-
 ## Related
 
 - [cli-spinners](https://github.com/sindresorhus/cli-spinners)
-

@@ -1,10 +1,18 @@
 # bash-cli-spinners
 > +80 spinners for use in the terminal
 
-![demo](assets/demo.svg)
+
+<p align="center">
+        <br>
+        <img width="700" src="assets/demo.svg">
+        <br>
+        <br>
+    </p>
 
 A bash/zsh cli spinner library **heavily inspired** by
 [cli-spinners](https://github.com/sindresorhus/cli-spinners).
+
+**🌐 <a href="https://simeg.github.io/bash-cli-spinners/" target="_blank">View Live Demo of all spinners</a> 🌐**
 
 ## Features
 
@@ -45,9 +53,6 @@ sudo apt install jq bc
 
 # Run the demo
 ./demo.sh
-
-# Browse all spinners in a web gallery
-make serve
 ```
 
 ## Usage
@@ -79,44 +84,7 @@ make serve
 - Bright: `bright_red`, `bright_green`, `bright_yellow`, `bright_blue`,
 `bright_magenta`, `bright_cyan`, `bright_white`
 
-## Popular Spinners
-
-Some of the most popular spinners include:
-
-- `dots` - Classic braille dots
-- `line` - Rotating line
-- `pong` - Pong game animation
-- `arrow` - Rotating arrows
-- `hearts` - Colored hearts
-- `moon` - Moon phases
-- `weather` - Weather icons
-- `shark` - Swimming shark
-- `material` - Material design progress bar
-
-## Web Gallery
-
-Browse all +80 spinners in an interactive web interface:
-
-```bash
-make serve
-```
-
-This starts a local web server at `http://localhost:8080` with features:
-- Live preview of all spinners at authentic speeds
-- Search and filter functionality
-- Click-to-copy spinner names
-- Light/dark theme toggle
-- Responsive design for all devices
-
 ## Architecture
-
-The library is built with a clean architecture:
-
-- `spinners.json` - Official cli-spinners database (+80 spinners)
-- `spinner.sh` - Core engine with JSON parsing and animation logic
-- `demo.sh` - Interactive demonstration script
-- `website/` - Web gallery for browsing spinners
-- `Makefile` - Build targets for serving and demos
 
 ### JSON Structure
 
@@ -160,8 +128,7 @@ Edit `spinners.json` to add your own spinners:
 }
 ```
 
-## License
+## Related
 
-MIT License - See LICENSE file for details.
+- [cli-spinners](https://github.com/sindresorhus/cli-spinners)
 
-This project uses the spinner definitions from [cli-spinners](https://github.com/sindresorhus/cli-spinners).

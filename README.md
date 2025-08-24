@@ -1,7 +1,6 @@
 # bash-cli-spinners
 > +80 spinners for use in the terminal
 
-
 <p align="center">
         <br>
         <img width="700" src="assets/demo.svg">
@@ -16,9 +15,8 @@ A bash/zsh cli spinner library **heavily inspired** by
 
 ## Features
 
-- **+80 spinners** from the official cli-spinners collection
+- **+80 spinners** from the [`cli-spinners`](https://github.com/sindresorhus/cli-spinners) package
 - **JSON-based** - Easy to extend and maintain
-- **Accurate timing** - Uses the official intervals from cli-spinners
 - **Color support** - 14 different colors available
 - **Two modes** - Show for duration or run with command
 - **Clean output** - Proper cursor management and cleanup

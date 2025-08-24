@@ -1,14 +1,14 @@
 # bash-cli-spinners
-> +90 spinners for use in the terminal
+> +80 spinners for use in the terminal
 
-![demo](demo.svg)
+![demo](assets/demo.svg)
 
-A bash/zsh cli spinner library heavily inspired by
+A bash/zsh cli spinner library **heavily inspired** by
 [cli-spinners](https://github.com/sindresorhus/cli-spinners).
 
 ## Features
 
-- **90+ spinners** from the official cli-spinners collection
+- **+80 spinners** from the official cli-spinners collection
 - **JSON-based** - Easy to extend and maintain
 - **Accurate timing** - Uses the official intervals from cli-spinners
 - **Color support** - 14 different colors available
@@ -93,7 +93,7 @@ Some of the most popular spinners include:
 
 The library is built with a clean architecture:
 
-- `spinners.json` - Official cli-spinners database (90+ spinners)
+- `spinners.json` - Official cli-spinners database (+80 spinners)
 - `spinner.sh` - Core engine with JSON parsing and animation logic
 - `demo.sh` - Interactive demonstration script
 

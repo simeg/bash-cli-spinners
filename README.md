@@ -55,6 +55,14 @@ sudo apt install jq bc
 ./demo.sh
 ```
 
+## Available Colors
+
+### Basic Colors
+![red](https://img.shields.io/badge/red-red?style=flat&color=CD5C5C) ![green](https://img.shields.io/badge/green-green?style=flat&color=228B22) ![yellow](https://img.shields.io/badge/yellow-yellow?style=flat&color=DAA520) ![blue](https://img.shields.io/badge/blue-blue?style=flat&color=4169E1) ![magenta](https://img.shields.io/badge/magenta-magenta?style=flat&color=DA70D6) ![cyan](https://img.shields.io/badge/cyan-cyan?style=flat&color=20B2AA) ![white](https://img.shields.io/badge/white-white?style=flat&color=F5F5F5)
+
+### Bright Colors
+![bright_red](https://img.shields.io/badge/bright__red-bright_red?style=flat&color=FF6B6B) ![bright_green](https://img.shields.io/badge/bright__green-bright_green?style=flat&color=51CF66) ![bright_yellow](https://img.shields.io/badge/bright__yellow-bright_yellow?style=flat&color=FFD93D) ![bright_blue](https://img.shields.io/badge/bright__blue-bright_blue?style=flat&color=74C0FC) ![bright_magenta](https://img.shields.io/badge/bright__magenta-bright_magenta?style=flat&color=F783AC) ![bright_cyan](https://img.shields.io/badge/bright__cyan-bright_cyan?style=flat&color=66D9EF) ![bright_white](https://img.shields.io/badge/bright__white-bright_white?style=flat&color=FFFFFF)
+
 ## Usage
 
 ### Basic Usage
@@ -77,12 +85,6 @@ sudo apt install jq bc
 # Material design spinner while compiling
 ./spinner.sh run material "Compiling project" bright_blue make build
 ```
-
-## Available Colors
-
-- Basic: `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`
-- Bright: `bright_red`, `bright_green`, `bright_yellow`, `bright_blue`,
-`bright_magenta`, `bright_cyan`, `bright_white`
 
 ## Architecture
 

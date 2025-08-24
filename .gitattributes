@@ -1,0 +1,2 @@
+# Exclude HTML files under website/ from language stats
+website/*.html linguist-detectable=false

@@ -141,14 +141,8 @@ show_spinner() {
     done
 
     # Clear line and restore cursor
-    if [[ "$demo_mode" == "true" ]]; then
-        printf "\r\033[K"
-        printf "\033[?25h${reset_code}"
-    else
-        printf "\r\033[K"
-        printf "\033[?25h${reset_code}"
-        echo "✓ ${message} Done!"
-    fi
+    printf "\r\033[K"
+    printf "\033[?25h${reset_code}"
 }
 
 # Run spinner while executing a command
@@ -234,12 +228,6 @@ run_with_spinner() {
     # Clear line and restore cursor
     printf "\r\033[K"
     printf "\033[?25h${reset_code}"
-
-    if [[ $exit_code -eq 0 ]]; then
-        echo "✓ ${message} Done!"
-    else
-        echo "✗ ${message} Failed!"
-    fi
 
     return $exit_code
 }

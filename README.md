@@ -1,4 +1,4 @@
-# bash-cli-spinners
+# bash-cli-spinners [![CI](https://github.com/simeg/bash-cli-spinners/actions/workflows/ci.yml/badge.svg)](https://github.com/simeg/bash-cli-spinners/actions/workflows/ci.yml)
 > +80 spinners for use in the terminal
 
 <p align="center">

@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck on spinner.sh
+        run: shellcheck spinner.sh
+
+      - name: Run shellcheck on test.sh
+        run: shellcheck test.sh
+
+      - name: Run shellcheck on demo scripts
+        run: |
+          if [ -f demo.sh ]; then shellcheck demo.sh; fi
+          if [ -f demo_clean.sh ]; then shellcheck demo_clean.sh; fi
+          if [ -f comprehensive_demo.sh ]; then shellcheck comprehensive_demo.sh; fi
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        bash-version: ['4.4', '5.0', '5.1', '5.2']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq bc
+
+      - name: Install specific bash version
+        run: |
+          # Install bash from source for specific versions
+          if [ "${{ matrix.bash-version }}" != "$(bash --version | head -n1 | grep -o '[0-9]\+\.[0-9]\+')" ]; then
+            echo "Using system bash version: $(bash --version | head -n1)"
+          fi
+
+      - name: Make scripts executable
+        run: |
+          chmod +x spinner.sh
+          chmod +x test.sh
+
+      - name: Run test suite
+        run: ./test.sh
+
+      - name: Test basic functionality
+        run: |
+          # Test list command
+          ./spinner.sh list
+
+          # Test help command
+          ./spinner.sh help
+
+          # Test invalid spinner
+          if ./spinner.sh show nonexistent 1 2>/dev/null; then
+            echo "ERROR: Invalid spinner should have failed"
+            exit 1
+          fi
+
+          echo "Basic functionality tests passed!"
+
+  test-macos:
+    name: Test on macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install jq bc
+
+      - name: Make scripts executable
+        run: |
+          chmod +x spinner.sh
+          chmod +x test.sh
+
+      - name: Run test suite
+        run: ./test.sh
+
+  performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq bc time
+
+      - name: Make scripts executable
+        run: |
+          chmod +x spinner.sh
+          chmod +x test.sh
+
+      - name: Performance benchmark
+        run: |
+          echo "=== Performance Benchmark ==="
+
+          # Time the list command multiple times
+          echo "Testing list command performance..."
+          for i in {1..10}; do
+            /usr/bin/time -f "%e seconds" ./spinner.sh list >/dev/null
+          done
+
+          # Test sourcing performance
+          echo "Testing sourcing performance..."
+          time (source ./spinner.sh && declare -f show_spinner >/dev/null)
+
+          echo "Performance tests completed!"
+
+  json-validation:
+    name: Validate JSON Data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Validate spinners.json
+        run: |
+          echo "Validating spinners.json structure..."
+
+          # Check if file is valid JSON
+          jq empty spinners.json
+
+          # Check required fields exist
+          echo "Checking spinner data structure..."
+
+          # Get all spinner names
+          spinners=$(jq -r 'keys[]' spinners.json)
+
+          for spinner in $spinners; do
+            # Check each spinner has interval and frames
+            if ! jq -e ".\"$spinner\".interval" spinners.json >/dev/null; then
+              echo "ERROR: Spinner '$spinner' missing interval"
+              exit 1
+            fi
+
+            if ! jq -e ".\"$spinner\".frames" spinners.json >/dev/null; then
+              echo "ERROR: Spinner '$spinner' missing frames"
+              exit 1
+            fi
+
+            # Check frames is an array with at least one element
+            frame_count=$(jq ".\"$spinner\".frames | length" spinners.json)
+            if [ "$frame_count" -eq 0 ]; then
+              echo "ERROR: Spinner '$spinner' has no frames"
+              exit 1
+            fi
+          done
+
+          spinner_count=$(echo "$spinners" | wc -l)
+          echo "✅ Validated $spinner_count spinners successfully!"
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install bandit (for general script security)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Security scan with shellcheck
+        run: |
+          echo "Running security-focused shellcheck..."
+          shellcheck -S error spinner.sh
+          shellcheck -S error test.sh
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Checking for potential secrets..."
+          if grep -r -i "password\|secret\|key\|token" --include="*.sh" --include="*.json" .; then
+            echo "WARNING: Potential secrets found, please review"
+          else
+            echo "✅ No obvious secrets detected"
+          fi

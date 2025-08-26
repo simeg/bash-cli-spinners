@@ -3,9 +3,21 @@
 # JSON-based Bash Loading Spinner Engine
 # Based on cli-spinners: https://github.com/sindresorhus/cli-spinners
 
+# shellcheck disable=SC2034  # Some variables may appear unused in specific conditions
+
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SPINNERS_JSON="$SCRIPT_DIR/spinners.json"
+
+# Performance optimization: Cache parsed data (requires bash 4.0+)
+if [[ "${BASH_VERSION%%.*}" -ge 4 ]]; then
+    declare -A SPINNER_FRAMES_CACHE
+    declare -A SPINNER_INTERVAL_CACHE
+    CACHE_ENABLED=true
+else
+    CACHE_ENABLED=false
+fi
+CACHE_LOADED=false
 
 # Check if jq is available for JSON parsing
 if ! command -v jq >/dev/null 2>&1; then
@@ -19,32 +31,105 @@ if [[ ! -f "$SPINNERS_JSON" ]]; then
     exit 1
 fi
 
+# Load all spinner data into cache for performance
+load_spinner_cache() {
+    if [[ "$CACHE_LOADED" == "true" ]]; then
+        return 0
+    fi
+
+    # Skip caching if not supported
+    if [[ "$CACHE_ENABLED" != "true" ]]; then
+        CACHE_LOADED=true
+        return 0
+    fi
+
+    local spinner_names
+    if ! spinner_names=$(jq -r 'keys[]' "$SPINNERS_JSON" 2>/dev/null); then
+        echo "Error: Failed to parse spinners.json" >&2
+        return 1
+    fi
+
+    while IFS= read -r spinner_name; do
+        [[ -z "$spinner_name" ]] && continue
+
+        # Cache frames (joined with newlines for storage)
+        local frames
+        frames=$(jq -r ".\"$spinner_name\".frames[]" "$SPINNERS_JSON" 2>/dev/null | tr '\n' '\0')
+        SPINNER_FRAMES_CACHE["$spinner_name"]="$frames"
+
+        # Cache interval
+        local interval
+        interval=$(jq -r ".\"$spinner_name\".interval" "$SPINNERS_JSON" 2>/dev/null)
+        SPINNER_INTERVAL_CACHE["$spinner_name"]="$interval"
+
+    done <<< "$spinner_names"
+
+    CACHE_LOADED=true
+}
+
 # List all available spinners
 list_spinners() {
     echo "Available spinners:"
     jq -r 'keys[]' "$SPINNERS_JSON" | sort
 }
 
-# Get spinner data
+# Get spinner data (updated to work with cache)
 get_spinner_data() {
     local spinner_name="$1"
-    if ! jq -e ".\"$spinner_name\"" "$SPINNERS_JSON" >/dev/null 2>&1; then
-        echo "Error: Spinner '$spinner_name' not found" >&2
-        return 1
+
+    if [[ "$CACHE_ENABLED" == "true" ]]; then
+        load_spinner_cache || return 1
+
+        if [[ -z "${SPINNER_FRAMES_CACHE[$spinner_name]:-}" ]]; then
+            echo "Error: Spinner '$spinner_name' not found" >&2
+            return 1
+        fi
+
+        # Return cached data in JSON format for compatibility
+        local frames_json
+        frames_json=$(printf '%s' "${SPINNER_FRAMES_CACHE[$spinner_name]}" | tr '\0' '\n' | sed 's/.*/"&"/' | tr '\n' ',' | sed 's/,$//')
+        echo "{\"interval\":${SPINNER_INTERVAL_CACHE[$spinner_name]},\"frames\":[$frames_json]}"
+    else
+        # Fallback to direct JSON parsing
+        if ! jq -e ".\"$spinner_name\"" "$SPINNERS_JSON" >/dev/null 2>&1; then
+            echo "Error: Spinner '$spinner_name' not found" >&2
+            return 1
+        fi
+        jq -r ".\"$spinner_name\"" "$SPINNERS_JSON"
     fi
-    jq -r ".\"$spinner_name\"" "$SPINNERS_JSON"
 }
 
-# Get spinner frames
+# Get spinner frames (optimized with cache)
 get_frames() {
     local spinner_name="$1"
-    jq -r ".\"$spinner_name\".frames[]" "$SPINNERS_JSON" 2>/dev/null
+
+    # Use cache if available
+    if [[ "$CACHE_ENABLED" == "true" ]]; then
+        load_spinner_cache || return 1
+
+        if [[ -z "${SPINNER_FRAMES_CACHE[$spinner_name]:-}" ]]; then
+            return 1
+        fi
+
+        printf '%s' "${SPINNER_FRAMES_CACHE[$spinner_name]}" | tr '\0' '\n'
+    else
+        # Fallback to direct JSON parsing
+        jq -r ".\"$spinner_name\".frames[]" "$SPINNERS_JSON" 2>/dev/null
+    fi
 }
 
-# Get spinner interval (in milliseconds)
+# Get spinner interval (optimized with cache)
 get_interval() {
     local spinner_name="$1"
-    jq -r ".\"$spinner_name\".interval" "$SPINNERS_JSON" 2>/dev/null
+
+    # Use cache if available
+    if [[ "$CACHE_ENABLED" == "true" ]]; then
+        load_spinner_cache || return 1
+        echo "${SPINNER_INTERVAL_CACHE[$spinner_name]:-}"
+    else
+        # Fallback to direct JSON parsing
+        jq -r ".\"$spinner_name\".interval" "$SPINNERS_JSON" 2>/dev/null
+    fi
 }
 
 # Convert milliseconds to seconds for bash sleep
@@ -128,7 +213,8 @@ show_spinner() {
     trap 'printf "\033[?25h\033[0m"; exit' EXIT INT TERM
 
     # Run spinner animation
-    local start_time=$(date +%s)
+    local start_time
+    start_time=$(date +%s)
     local end_time=$((start_time + duration))
     local frame_index=0
 
@@ -142,7 +228,7 @@ show_spinner() {
 
     # Clear line and restore cursor
     printf "\r\033[K"
-    printf "\033[?25h${reset_code}"
+    printf "\033[?25h%s" "${reset_code}"
 }
 
 # Run spinner while executing a command
@@ -227,7 +313,7 @@ run_with_spinner() {
 
     # Clear line and restore cursor
     printf "\r\033[K"
-    printf "\033[?25h${reset_code}"
+    printf "\033[?25h%s" "${reset_code}"
 
     return $exit_code
 }

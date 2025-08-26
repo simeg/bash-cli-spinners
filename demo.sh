@@ -4,7 +4,6 @@
 # place
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SPINNER_SCRIPT="$SCRIPT_DIR/spinner.sh"
 
 # All requested spinners with colors (duration calculated dynamically)
 spinners=(
@@ -114,7 +113,6 @@ printf "\033[?25l"
 trap 'printf "\033[?25h\033[0m"; exit' EXIT INT TERM
 
 # Track progress
-total=${#spinners[@]}
 current=0
 
 for spinner_config in "${spinners[@]}"; do
